@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="all">
+                <div class="ibox-title">
+                    <h5> 参数详细信息列表</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <form id="etcd_form">
+                        <div class="col-sm-1" style="padding-left: 0">
+                            <a href="{% url 'etcd_add' %}" class="btn btn-sm btn-primary "> 添加参数 </a>
+                        </div>
+                        <div class="col-sm-7" style="padding-left: 0px">
+
+                            <label>
+                                <select name="etcd_env" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">环境</option>
+                                    {% for env in etcd_envs %}
+                                        {% ifequal env.0|int2str etcd_env %}
+                                            <option value="{{ env.0 }}" selected> {{ env.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ env.0 }}"> {{ env.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+
+                            <label>
+                                <select name="group" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">参数组</option>
+                                    {% for etcd_group in etcd_group_all %}
+                                        {% ifequal etcd_group.name group_name %}
+                                            <option value="{{ etcd_group.name }}" selected> {{ etcd_group.name|slice:":20" }} </option>
+                                        {% else %}
+                                            <option value="{{ etcd_group.name }}"> {{ etcd_group.name|slice:":20" }} </option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+
+                            <label>
+                                <select name="etcd_type" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">参数类型</option>
+                                    {% for type in etcd_types %}
+                                        {% ifequal type.0|int2str etcd_type %}
+                                            <option value="{{ type.0 }}" selected> {{ type.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ type.0 }}"> {{ type.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+
+                            <label>
+                                <select name="status" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">参数状态</option>
+                                    {% for s in etcd_status %}
+                                        {% ifequal s.0|int2str status %}
+                                            <option value="{{ s.0 }}" selected> {{ s.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ s.0 }}"> {{ s.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="col-sm-4" style="padding-right: 0">
+                             <div class="input-group inline-group">
+                                <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
+                                <input type="text" style="display: none">
+                                <div class="input-group-btn">
+                                    <button id='search_btn' href="{% url 'etcd_list' %}?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
+                                        - 搜索 -
+                                    </button>
+                                    <button type="button" href="{% url 'etcd_list' %}?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
+                                        - 导出 -
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="export"></div>
+                        <table class="table table-striped table-bordered table-hover " id="editable" name="editable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('etcd_form')">
+                                    </th>
+                                    <th class="text-center"> 参数名 </th>
+                                    <th class="text-center" name="value"> 参数值 </th>
+                                    <th class="text-center"> 应用名称 </th>
+                                    <th class="text-center"> 参数组 </th>
+                                    <th class="text-center"> 环境 </th>
+                                    <th class="text-center"> 创建时间 </th>
+                                    <th class="text-center"> 操作 </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for etcd in etcds.object_list %}
+                                <tr class="gradeX">
+                                    <td class="text-center" name="id" value="{{ etcd.id }}" data-editable='false'>
+                                        <input name="id" value="{{ etcd.id }}" type="checkbox" class="i-checks">
+                                    </td>
+                                    <td class="text-center name"> <a href="{% url 'etcd_detail' %}?id={{ etcd.id }}">{{ etcd.name|default_if_none:"" }}</a></td>
+                                    <td class="text-center"> {{ etcd.value|default_if_none:"" }} </td>
+                                    <td class="text-center">{{ etcd.appname|default_if_none:"" }}</td>
+                                    <td class="text-center">{{ etcd.group.all|group_str2 }}</td>
+                                    <td class="text-center">{{ etcd.get_etcd_env_display|default_if_none:"" }}</td>
+                                    <td class="text-center">{{ etcd.date_added|date:"Y-m-d H:i:s" }}</td>
+                                    <td class="text-center" data-editable='false'>
+                                        <a href="{% url 'etcd_edit' %}?id={{ etcd.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a value="{% url 'etcd_del' %}?id={{ etcd.id }}" class="btn btn-xs btn-danger etcd_del">删除</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input type="button" id="etcd_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
+                                <a value="{% url 'etcd_edit_batch' %}" type="button" class="btn btn-sm btn-warning iframe">修改</a>
+                                <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
+                            </div>
+                            {% include 'paginator.html' %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block self_footer_js %}
+<script>
+    $(document).ready(function(){
+        $('.etcd_del').click(function(){
+            var row = $(this).closest('tr');
+            if (confirm("确定删除?")) {
+                $.get(
+                        $(this).attr('value'),
+                        {},
+                        function (data) {
+                            row.remove()
+                        }
+                )
+            }
+        });
+
+        $('#exec_cmd').click(function(){
+            var url = '{% url "role_get" %}';
+            var new_url = '{% url "exec_cmd" %}?role=';
+            var check_array = [];
+            $(".gradeX input:checked").closest('tr').find('.name a').each(function() {
+                check_array.push($(this).text())
+            });
+            check_etcds = check_array.join(':');
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {},
+                success: function(data){
+                    var dataArray = data.split(',');
+                    if (dataArray.length == 1 && data != 'error'){
+                        var title = 'UTOPIA Exec Terminal';
+                        layer.open({
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['725px', '600px'],
+                            content: new_url+data+'&check_etcds='+check_etcds
+                        });
+                        //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
+                    } else if (dataArray.length == '1' && data == 'error'){
+                        layer.alert('没有授权系统用户')
+                    } else {
+                        aUrl = '';
+                        $.each(dataArray, function(index, value){
+                            aUrl += '<a onclick="windowOpenExec(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value  + '&check_etcds=' + check_etcds + '>' + value  + '</a> '
+                        });
+                        layer.alert(aUrl, {
+                            skin: 'layui-layer-molv',
+                            title: '授权多个系统用户，请选择一个连接',
+                            shade: false,
+                            closeBtn: 0
+                        })
+                    }
+                }
+            });
+            return false
+
+        });
+
+        $('.conn').click(function(){
+            var url='{% url "role_get" %}?id=' + $(this).attr('value'); // 获取用户有权限的角色
+            var href = $(this).attr('href');
+            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role='; // webterminal socket url
+            var name = $(this).closest('tr').find('.name a')[0].innerHTML;
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {},
+                success: function(data){
+                    var dataArray = data.split(',');
+                    if (data == 'error' || data == '' || data == null || data == undefined){
+                        layer.alert('没有授权系统用户')
+                    }
+                    else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32'){
+                        var title = 'UTOPIA Web Terminal' + '<span class="text-info"> '+ name +'</span>';
+                        layer.open({
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['628px', '420px'],
+                            content: new_url+data
+                        });
+                    }  else if (dataArray.length == 1 && data != 'error'){
+                       layer.open({
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['628px', '452px'],
+                            content: new_url+data
+                        });
+                    }
+                    else {
+                        aUrl = '';
+                        $.each(dataArray, function(index, value){
+                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + name +  '>' + value  + '</a> '
+                        });
+                        console.log(aUrl);
+                        layer.alert(aUrl, {
+                            skin: 'layui-layer-molv',
+                            title: '授权多个系统用户，请选择一个连接',
+                            shade: false,
+                            closeBtn: 0
+                        })
+                    }
+                }
+            });
+            return false
+        });
+    });
+
+    function windowOpen(a){
+        var new_url = $(a).attr('href');
+        var name = $(a).attr('value');
+        var title = 'UTOPIA Web Terminal - ' + '<span class="text-info"> '+ name +'</span>';
+        if (navigator.platform == 'Win32'){
+            layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            area: ['628px', '420px'],
+            shade: false,
+            content: new_url
+            });
+
+        } else {
+            layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            area: ['628px', '452px'],
+            shade: false,
+            content: new_url
+            });
+        }
+
+        return false
+    }
+
+     function windowOpenExec(a){
+         var new_url = $(a).attr('href');
+         var title = 'UTOPIA Exec Terminal';
+         layer.open({
+             type: 2,
+             title: title,
+             maxmin: true,
+             area: ['725px', '600px'],
+             shade: false,
+             content: new_url
+        });
+         console.log(new_url);
+        return false
+    }
+
+    $(".iframe").on('click', function(){
+        var etcd_id_all = getIDall();
+        if (etcd_id_all == ''){
+            alert("请至少选择一行!");
+            return false;
+        }
+        var url= $(this).attr("value") + '?etcd_id_all=' + etcd_id_all;
+        parent.layer.open({
+            type: 2,
+            title: 'JumpServer - 批量修改参数',
+            maxmin: true,
+            shift: 'top',
+            border: [2, 0.3, '#1AB394'],
+            shade: [0.5, '#000000'],
+            area: ['800px', '600px'],
+            shadeClose: true,
+            content: url,
+            cancel: function(){
+                location.replace(location.href);
+            }
+        });
+    });
+
+    $('.search-btn-excel').unbind('click').bind('click',function(){
+        var url= $(this).attr("href");
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: $("#etcd_form").serialize(),
+            success: function (data) {
+                $("#export").html(data);
+            }
+        });
+    });
+
+
+    $('#etcd_del').click(function () {
+        var etcd_id_all = getIDall();
+        if (etcd_id_all == ''){
+            alert("请至少选择一行!");
+            return false;
+        }
+        if (confirm("确定删除?")) {
+            $.ajax({
+                type: "post",
+                data: {etcd_id_all: etcd_id_all},
+                url: "{% url 'etcd_del' %}?arg=batch",
+                success: function () {
+                    parent.location.reload();
+                }
+            });
+        }
+    });
+
+    $('#etcd_update').click(function () {
+        var etcd_id_all = getIDall();
+        if (etcd_id_all == ''){
+            if (confirm("更新全部参数信息?")) {
+                layer.msg('玩命更新中...', {time: 200000});
+                $.ajax({
+                    type: "post",
+                    url: "{% url 'etcd_update_batch' %}?arg=all",
+                    success: function () {
+                        parent.location.reload();
+                    }
+                });
+            }
+        }
+        else {
+            layer.msg('玩命更新中...', {time: 200000});
+            $.ajax({
+                type: "post",
+                data: {etcd_id_all: etcd_id_all},
+                url: "{% url 'etcd_update_batch' %}",
+                success: function () {
+                    parent.location.reload();
+                }
+            });
+        }
+    });
+
+    function change_info(){
+        var args = $("#etcd_form").serialize();
+        window.location = "{% url 'etcd_list' %}?" + args
+    }
+
+    $("#search_input").keydown(function(e){
+        if(e.keyCode==13){
+            change_info()
+            }
+    });
+</script>
+
+{% endblock %}

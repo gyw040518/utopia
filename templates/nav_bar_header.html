@@ -1,0 +1,165 @@
+{% load humanize %}
+{% load mytags %}
+<nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="glyphicon glyphicon-transfer"></i> </a>
+        <form role="search" class="navbar-form-custom" method="get" action="">
+            <div class="form-group">
+                <input type="text" placeholder="输入搜索..." class="form-control" name="search" id="top-search">
+            </div>
+        </form>
+    </div>
+    <ul class="nav navbar-top-links navbar-right">
+        <li>
+            <span class="m-r-sm text-muted welcome-message">欢迎使用Utopia统一管理平台</span>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
+                <span class="nav-text">App 1.0</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages animated fadeInDown m-t-xs">
+                        <li>
+                            <div class="dropdown-messages-box">
+                                <a href="#" class="pull-left">
+                                    <img alt="image" src="/static/img/cmp.png">
+                                </a>
+                                <div class="media-body">
+                                    <small class="pull-right text-navy">2015-12.14</small>
+                                    <strong>欢迎使用德邦APP</strong><br>
+                                    <small class="text-muted">ISO & ANDROD；</small><br/>
+                                    <small class="text-muted">享受一站式服务；</small><br/>
+                                    <small class="text-muted">关注公司最新动态。</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="text-center link-block">
+                                <span class="glyphicon glyphicon-tower" aria-hidden="true"></span> <strong>德邦APP</strong>
+                            </div>
+                        </li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                <span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
+                <span class="nav-text">费用</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages animated fadeInDown m-t-xs">
+                        <li>
+                            <div class="dropdown-messages-box">
+                                <a href="#" class="pull-left">
+                                    <img alt="image" class="img-circle" src="/static/img/davy.jpg">
+                                </a>
+                                <div class="media-body">
+                                    <small class="pull-right text-navy">2015-12.14</small>
+                                    <strong>davy</strong><br>
+                                    <small class="text-muted">部门: scm</small><br/>
+                                    <small class="text-muted">内容: 请审批 谢谢</small><br/>
+                                    <small class="text-muted">申请时间: 2015.12.14</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="text-center link-block">
+                                <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> <strong>Read All Messages</strong>
+                            </div>
+                        </li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                <span class="label label-warning">2</span>
+                <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+                <span class="nav-text">工单</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages animated fadeInDown m-t-xs">
+                        <li>
+                            <div class="dropdown-messages-box">
+                                <a href="#" class="pull-left">
+                                    <img alt="image" class="img-circle" src="/static/img/davy.jpg">
+                                </a>
+                                <div class="media-body">
+                                    <small class="pull-right text-navy">2015-12.14</small>
+                                    <strong>davy</strong><br>
+                                    <small class="text-muted">部门: scm</small><br/>
+                                    <small class="text-muted">内容: 请审批 谢谢</small><br/>
+                                    <small class="text-muted">申请时间: 2015.12.14</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="text-center link-block">
+                                <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> <strong>Read All Messages</strong>
+                            </div>
+                        </li>
+            </ul>
+        </li>
+         <li class="dropdown">
+            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+            <span class="label label-warning">9</span>
+            <span class="glyphicon glyphicon-envelope"></span>
+            <span class="nav-text">消息</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages animated fadeInDown m-t-xs">
+                        <li>
+                            <div class="dropdown-messages-box">
+				<a href="#" class="pull-left">
+                                    <img alt="image" class="img-circle" src="/static/img/davy.jpg">
+                                </a>
+                                <div class="media-body">
+                                    <small class="pull-right text-navy">2015-12.14</small>
+                                    <strong>davy</strong><br>
+                                    <small class="text-muted">部门: scm</small><br/>
+                                    <small class="text-muted">内容: 请审批 谢谢</small><br/>
+                                    <small class="text-muted">申请时间: 2015.12.14</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="text-center link-block">
+                            	<span class="glyphicon glyphicon-envelope"></span> <strong>Read All Messages</strong>
+                            </div>
+                        </li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                <span class="nav-text">帮助</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages animated fadeInDown m-t-xs">
+                        <li>
+                            <div class="dropdown-messages-box">
+                                <a href="#" class="pull-left">
+                                    <img alt="image" src="/static/img/weixin.png">
+                                </a>
+                                <div class="media-body">
+                                    <small class="pull-right text-navy">2015-12.14</small>
+                                    <strong>微信</strong><br>
+                                    <small class="text-muted">新客户专区</small><br/>
+                                    <small class="text-muted">常见问题</small><br/>
+                                    <small class="text-muted">在线客服</small>
+                                    <small class="text-muted">宝贵建议</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="text-center link-block">
+                                <span class="glyphicon glyphicon-link" aria-hidden="true"></span> <strong>德邦微信公众号</strong>
+                            </div>
+                        </li>
+            </ul>
+        </li>
+        <li>
+            <a href="{% url 'logout' %}">
+                <i class="fa fa-sign-out"></i> Log out
+            </a>
+        </li>
+    </ul>
+</nav>

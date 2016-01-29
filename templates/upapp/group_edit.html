@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+<script type="text/javascript">
+    function search_value(text, noselect, total){
+        $("#" + noselect).children().each(
+            function(){
+                $(this).remove();
+            });
+
+        $("#" + total).children().each(function(){
+            if($(this).text().search(text) != -1){
+                $("#" + noselect).append($(this).clone())
+            }
+            })
+    }
+</script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div id="ibox-content" class="ibox-title">
+                    <h5> 填写应用组基本信息 </h5>
+                    <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                 <select id="apps_total" name="apps" class="form-control m-b" size="12" multiple style="display: none">
+                    {% for app in app_all %}
+                        <option value="{{ app.id }}">{{ app.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="app_select_total" name="j_hosts" class="form-control m-b" size="12"  multiple style="display: none">
+                    {% for app in app_select %}
+                        <option value="{{ app.id }}">{{ app.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="ibox-content">
+                    {% if emg %}
+                        <div class="alert alert-warning text-center">{{ emg }}</div>
+                    {% endif %}
+                    {% if smg %}
+                        <div class="alert alert-success text-center">{{ smg }}</div>
+                    {% endif %}
+                    <form id="appForm" method="post" class="form-horizontal">
+                        <div class="form-group"><label class="col-sm-2 control-label"> 应用组名<span class="red-fonts">*</span></label>
+                            <div class="col-sm-8" name="group_id" value="{{ group.id }}"><input type="text" value="{{ group.name }}" placeholder="Name" name="name" class="form-control"></div>
+                        </div>
+
+                       <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="group_name" class="col-sm-2 control-label">过滤</label>
+                            <div class="col-sm-4">
+                                <input id="noselect" class="form-control" oninput="search_value(this.value, 'apps', 'apps_total')">
+                            </div>
+                            <div class="col-sm-1">
+                            </div>
+                            <div id="select" class="col-sm-3">
+                                <input  class="form-control" oninput="search_value(this.value, 'app_select', 'app_select_total')">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">应用<span class="red-fonts">*</span></label>
+                            <div class="col-sm-4">
+                                <div>
+                                    <select id="apps" name="apps" class="form-control m-b" size="12" multiple>
+                                        {% for app in app_no_select %}
+                                            <option value="{{ app.id }}">{{ app.name|default_if_none:"" }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1">
+                                <div class="btn-group" style="margin-top: 60px;">
+                                    <button type="button" class="btn btn-white" onclick="move('apps', 'app_select', 'apps_total', 'app_select_total'  )"><i class="fa fa-chevron-right"></i></button>
+                                    <button type="button" class="btn btn-white" onclick="move_left('app_select', 'apps', 'app_select_total', 'apps_total')"><i class="fa fa-chevron-left"></i> </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div>
+                                    <select id="app_select" name="app_select" class="form-control m-b" size="12"  multiple>
+                                        {% for app in app_select %}
+                                            <option value="{{ app.id }}">{{ app.name|default_if_none:"" }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
+                            <div class="col-sm-8"><input type="text" value="{{ group.comment }}" name="comment" class="form-control"></div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-5">
+                                <button class="btn btn-white" type="submit"> 重置 </button>
+                                <button class="btn btn-primary" id="submit_button" type="submit" onclick="on_submit('groups_selected')  "> 提交 </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $("#submit_button").click(function(){
+            $('#appForm option').each(function(){
+                $(this).prop('selected', true)
+            })
+        });
+
+    })
+
+    $('#appForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    fields: {
+        "j_group": {
+            rule: "required",
+            tip: "输入应用组名",
+            ok: "",
+            msg: {required: "应用名必须填写!"},
+            data: {'data-ok':"应用组名可以使用"}
+        }
+    },
+    valid: function(form) {
+        form.submit();
+    }
+});
+
+    function on_submit(id){
+        $('#'+id+' option').each(
+            function(){
+                $(this).prop('selected', true)
+            })
+        }
+</script>
+
+{% endblock %}

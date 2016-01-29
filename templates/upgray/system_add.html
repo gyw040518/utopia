@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% load bootstrap %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div id="ibox-content" class="ibox-title">
+                    <h5> 填写系统基本信息 </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="panel blank-panel">
+                        <div class="panel-options">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a class="text-center"><i class="fa fa-laptop"></i> 单个添加 </a></li>
+                            </ul>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div id="tab-1" class="ibox float-e-margins tab-pane active">
+                                    {% if error %}
+                                       <div class="alert alert-warning text-center">{{ error }}</div>
+                                    {% endif %}
+                                    {% if msg %}
+                                        <div class="alert alert-success text-center">{{ msg }}</div>
+                                    {% endif %}
+
+                                    <form id="ruleForm" method="post" class="form-horizontal">
+
+                                        {{ af.name|bootstrap_horizontal }}
+
+
+                                        <div class="form-group">
+                                            <label for="content_name" class="col-sm-2 control-label">规则名称</label>
+                                            <div class="col-sm-8">
+                                                <select name="rule_name" id="rule_name" class="form-control m-b input-sm" onchange="rule_content_list(this.value, 'contents')">
+                                                    <option value="">--请选择规则名称--</option>
+                                                    {% for system_rule in system_rule_all %}
+                                                    {% ifequal system_rule.name rule_name%}
+                                                        <option value="{{ system_rule.name }}" selected> {{ system_rule.name|slice:":20" }} </option>
+                                                    {% else %}
+                                                        <option value="{{ system_rule.name }}"> {{ system_rule.name|slice:":20" }} </option>
+                                                    {% endifequal %}
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+
+                                        <div class="form-group">
+                                            <label for="content_name" class="col-sm-2 control-label">过滤</label>
+                                            <div class="col-sm-3">
+                                                <input id="noselect" class="form-control" oninput="search_content(this.value, 'contents', 'contents_total')">
+                                            </div>
+                                            <div class="col-sm-1"></div>
+                                            <div id="select" class="col-sm-3">
+                                                <input  class="form-control" oninput="search_content(this.value, 'content_select', 'content_select_total')">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="" class="col-sm-2 control-label">A/B版本流量</label>
+                                            <div class="col-sm-3">
+                                                <div>
+                                                    <input type="text" id="content" size="20"></p>
+                                                    <select id="content" name="contents" class="form-control m-b" size="12" multiple>
+                                                        {% for content in content_no_select %}
+                                                            <option value="{{ rule.id }}">{{ rule.content|default_if_none:"" }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-1">
+                                                <div class="btn-group" style="margin-top: 30px;">
+                                                    <div><button type="button" class="btn btn-white" onclick="move('contens', 'contents_select', 'contents_total', 'rule_select_total'  )"><i class="glyphicon glyphicon-arrow-right"></i></button></div>
+                                                    <div><button type="button" class="btn btn-white" onclick="move_left('content_select', 'contents', 'content_select_total', 'rules_total')"><i class="glyphicon glyphicon-arrow-left"></i></button></div>
+                                                    <div><button type="button" class="btn btn-white" onclick="copy('contens', 'contents_select', 'contents_total', 'rule_select_total')"><i class="glyphicon glyphicon-fast-forward "></i></button></div>
+                                                    <div><button type="button" class="btn btn-white" onclick="copy_left('content_select', 'contents', 'content_select_total', 'contents_total')"><i class="glyphicon glyphicon-fast-backward"></i></button></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-3">
+                                                <div>
+                                                    <select id="content_select" name="content_select" class="form-control m-b" size="12"  multiple>
+                                                        {% for content in content_select %}
+                                                            <option value="{{ rule.id }}">{{ rule.content|default_if_none:"" }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        {{ af.status|bootstrap_horizontal }}
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-2">
+                                                <button class="btn btn-white" type="reset"> 重置 </button>
+                                                <button class="btn btn-primary" type="submit"> 提交 </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block self_footer_js %}
+<script>
+
+    $('document').ready(function(){
+        var check_default = "{{ default_setting.name }}";
+        console.log(check_default);
+        if (check_default != 'default'){
+            $('#id_use_default_auth').attr('disabled', true);
+            $('#id_use_default_auth').attr('checked', false);
+            $('#admin_account').css('display', 'block');
+        } else {
+            $('#id_use_default_auth').click(function(){
+                if ($(this).is(':checked')){
+                    $('#admin_account').css('display', 'none');
+                }
+                else {
+                    $('#admin_account').css('display', 'block');
+                }
+            })
+        }
+
+    });
+
+    var required_fields = ["id_name", "id_port"];
+    required_fields.forEach(function(field) {
+        $('label[for="' + field + '"]').parent().addClass("required");
+    });
+
+    $('#systemForm').validator({
+        timely: 2,
+        theme: "yellow_right_effect",
+        systems: {
+            use_default_auth: function() {
+                var str1 = $("#id_use_default_auth").is(":checked");
+                if (str1 == true){
+                    var decide = false;
+                } else {
+                    var decide = true;
+                }
+                return decide}
+        },
+        fields: {
+            "name": {
+                system: "required",
+                tip: "填写规则名称",
+                ok: "",
+                msg: {required: "必须填写!"}
+            }
+        },
+        valid: function(form) {
+            form.submit();
+        }
+
+    });
+    function search_content(text, noselect, total){
+        $("#" + noselect).children().each(
+            function(){
+                $(this).remove();
+            });
+
+        $("#" + total).children().each(function(){
+            if($(this).text().search(text) != -1){
+                $("#" + noselect).append($(this).clone())
+            }
+        })
+    }
+    
+
+function rule_content_list(text, total)
+{
+var rule_name=document.getElementById("rule_name")
+var content =
+document.getElementById("content").value=rule_name.options[rule_name.selectedIndex].text
+}
+
+</script>
+
+{% endblock %}

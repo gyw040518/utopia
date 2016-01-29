@@ -1,0 +1,36 @@
+{% load mytags %}
+<li class="nav-header">
+    <div class="dropdown profile-element">
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+            <span class="clear">
+                <span class="block m-t-xs">
+                    <div align="center"><strong class="font-bold">UTOPIA<span style="color: #8095a8">@DEPPON.COM</span></strong></div>
+                </span>
+            </span>
+        </a>
+        <ul class="dropdown-menu animated fadeInDown m-t-xs">
+            <li><a href="http://davideylee.blog.51cto.com">了解Utopia团队</a></li>
+            <li class="divider"></li>
+            <li><a href="http://www.deppon.com">访问Deppon官网</a></li>
+        </ul>
+    </div>
+    <div class="logo-element">
+        DP+
+    </div>
+</li>
+<script>
+    $(".iframe_user").on('click', function(){
+        var url= $(this).attr("value");
+        $.layer({
+            type: 2,
+            title: '官网',
+            maxmin: true,
+            shift: 'top',
+            border: [2, 0.3, '#1AB394'],
+            shade: [0.5, '#000000'],
+            shadeClose: true,
+            area : ['800px' , '600px'],
+            iframe: {src: url}
+        });
+    });
+</script>
